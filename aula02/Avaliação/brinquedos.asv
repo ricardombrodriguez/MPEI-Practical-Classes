@@ -1,0 +1,134 @@
+    
+p1 = 0.2/100;           %prob. da componente 1 do brinquedo ter defeito
+p2 = 0.5/100;           %prob. da componente 2 do brinquedo ter defeito
+pa = 1/100;             %prob. do processo de montagem ser insucedido
+
+pmontagem = 1/100;      %probabilidade de defeito na montagem do brinquedo
+
+% A -> "uma caixa de brinquedos tem pelo menos 1 brinquedo com defeito"
+
+%% 1)
+%% a)
+
+fprintf("1)\n");
+n = 8;        
+N = 10000;    %nº de simulações
+matriz = rand(3,n*N);
+matriz = ((matriz(1,:) <= p1) | (matriz(2,:) <= p2) | (matriz(3,:) <= pmontagem));
+probCaixaComDefeito = sum(matriz) / N;
+disp("A probabilidade de uma caixa de brinquedos ter pelo menos 1 brinquedo com defeito é " + probCaixaComDefeito);
+
+%% b)
+
+matriz = rand(3,n*N);
+matriz = matriz(3,:) <= pmontagem;
+probMontagemComDefeito = sum(matriz) / N;
+disp("b) O valor médio de brinquedos defeituosos apenas devido ao processo de montagem quando ocorre A é " + probMontagemComDefeito);
+
+
+%% 2)
+%% a)
+
+% B -> "Uma caixa de brinquedos não tem brinquedos com defeito"
+
+fprintf("\n2)\n");
+matriz = rand(3,n*N);
+SemDefeito = zeros(n,N);
+for k = 1:n*N
+        SemDefeito(k) = (matriz(1,k) > p1 & matriz(2,k) > p2 & matriz(3,k) > pmontagem);
+end
+probB = sum(sum(SemDefeito) == 8) / N;
+disp("a) Probabilidade de uma caixa de brinquedos não ter defeito: " + probB);
+
+%% b)
+
+
+
+
+
+%% c)
+
+valoresN = [2:20];
+probabilidades = zeros(1,length(valoresN));
+for n = 2:20
+    matriz = rand(3,n*N);
+    SemDefeito = zeros(n,N);
+    for k = 1:n*N
+        SemDefeito(k) = (matriz(1,k) > p1 & matriz(2,k) > p2 & matriz(3,k) > pmontagem);
+    end
+    probabilidades(n-1) = sum(sum(SemDefeito) == n) / N;
+end
+plot(valoresN, probabilidades);
+title("Probabilidade de uma caixa com n brinquedos não ter nenhum com defeito");
+xlabel("Número de brinquedos por caixa");
+ylabel("Probabilidade de a caixa não ter nenhum brinquedo com defeito");
+
+%% d)
+
+disp("d) Quando n = 6");
+
+
+%% 3)
+%% a)
+
+fprintf("\n3)\n");
+n = 8;
+N = 10000;
+numeros = [0:8];
+px = zeros(1,length(numeros));
+
+matriz = rand(3,n*N);
+ComDefeito = zeros(n,N);
+    for k = 1:n*N
+        ComDefeito(k) = (matriz(1,k) < p1 | matriz(2,k) < p2 | matriz(3,k) < pmontagem);
+    end
+
+for i = numeros
+    px(i+1) = sum(sum(ComDefeito) == i) / N;
+end
+
+stem(numeros,px);
+
+%% b)
+
+fx = cumsum(px);
+probXMaiorQue1 = fx(length(fx)) - fx(3);
+disp("b) P(X >= 2) = " + probXMaiorQue1);
+
+%% c)
+
+valorEsperado = 0;
+variancia = 0;
+
+for n = [0:8]
+    valorEsperado = valorEsperado + n*px(n+1);
+    variancia = variancia + ( (n^2) * px(n+1) * (1-px(n+1)) - ( n * px(n+1) * (1-px(n+1))^2 ));
+end
+
+desvioPadrao = sqrt(variancia);
+
+disp("c) Valor esperado = " + valorEsperado);
+disp("Variância = " + variancia);
+disp("Desvio Padrão = " + desvioPadrao);
+
+%% 4)
+%% a/b)
+
+fprintf("\n4)\n");
+
+n = 20;
+pmontagem = 0.1/100;
+matriz = rand(3,n*N);
+SemDefeito = zeros(n,N);
+for k = 1:n*N
+    SemDefeito(k) = (matriz(1,k) > p1 & matriz(2,k) > p2 & matriz(3,k) > pmontagem);
+end
+prob = zeros(1,20);
+
+for m = 1:20
+    probabilidades = zeros(1,N);
+    for i = 1:20:n*N
+        probabilidades(round(i/20)+1) = (sum(SemDefeito(i:(i+m)-1)) == m);
+    end
+    prob(m) = sum(probabilidades) / N;
+end          
